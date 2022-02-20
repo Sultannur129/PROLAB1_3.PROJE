@@ -1,0 +1,102 @@
+\documentclass[twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+
+\title{KOCAELİ ÜNİVERSİTESİ
+\\BİGİSAYAR MÜHENDİSLİĞİ
+\\PROGRAMLAMA LABORATUVARI 3.PROJE }
+\author{Sultannur KAYA - 200201043
+Arzu Sinem ACAR - 200201031}
+\date{20 Aralık 2021}
+
+\begin{document}
+
+\maketitle
+
+\section{ÖZET}
+
+\paragraph{Projenin amacı:Öncelikli kuyruk(priority quene) yapısını tanıyıp,bu yapıyı kullanarak havalimanı
+uçuş yönetim sistemi oluşturmak.}
+
+
+\section{GİRİŞ}
+\paragraph{Bir iniş ve bir kalkış olamak üzere iki piste sahip olan İstanbul Havalimanı 24 saatlik dilim boyunca uçakların iniş ve kalkışlarını düzenleyecek bir programa ihtiyaç duymaktadır.Bu havalimanında aynı anda sadece bir uçak iniş yapabilirken bir uçak da kalkış yapabilir.Uçakların iniş ve kalkış pistini kullanım sırası farklı önceliklere sahiptir.
+\\-Bir gün boyunca toplam 24 uçak iniş için kuleden izin isteyebilir.
+\\-Bu izin sonucunda inis\_pisti\_kullanim\_sirasi öncelikli kuyruğunda yeni uçak eklemek için boş alan olup olmadığı kontrol edilir.
+\\-Eğer talep edilen iniş saati uygun ise iniş için izin verilir.Eğer bu saat dilimi dolu ise iniş yapacak uçak öncelik sırasına göre karar verilir.Öncelik sırası(oncelik\_id) da ambulans uçağı-savaş uçağı-yolcu uçağı-kargo uçağı şeklindedir.
+\\-Eğer uçaklar aynı öncelik sırasına sahipse piste ilk iniş yapan uçağa ilk kalkış izni verilir.
+\\-Bu doluluk sırasında bir uçağın kalkış sırası en fazla üç defa ertelenebilir.Üç ertelemeden sonra koşul ne olursa olsun bu uçağa kalkış izni verilir.
+\\-İniş için izin talep eden uçaklar günde en fazla 24 ile sınırlıdır.Bu kapasite dolduktan sonra bulunan uçaklar farklı bir havalimanına yönlendirilmelidir.
+\\Bu tarz kriterlere uyularak proje hazırlanmıştır.
+}
+
+
+
+\section{YÖNTEM}
+\paragraph{Öncelikle struct Ucak yapımızın içerisine projede kullanacağımız değişkenleri integer tipinde atıyoruz.Bir diğer structımız ise uçakların önceliğini kontrol eden Ucak oncelik'tir.Struct içindeki elemanları bir diziye atayarak bunun üzerinden gidildi.Aynı zamanda kullandığımız kuyruk yapısı için de bir başlangıç değeri yani front bir de son değer olarak rear değişkeni atıyoruz.
+Bu proje için de içerisinde isterlerimizi kontrol ettiğimiz fonksiyon yapılarından yararlandık.IsQueueEmpty fonksiyonu ile kuyruğumuzun boş olup olmadığını kontrol ediyoruz.Eğer front değeri rear değerine eşitse kuyruk boş olmuş oluyor ve veriler bu kuyruğa atanıyor.Bool olarak aldığımız IsEmpty true olduğunda rear1==0 a eşit olduğu durumu döndürür.(Bool veri türü boolean türdeki
+verileri tutar.Bu veriler de true ya da false'tur.)IsQueueFull fonksiyonu ise kuyruğumuzun dolu olup olmadığını kontrol eder.Eğer rear değeri MAX değere ulaştıysa kuruk dolu olmuş olur ve havalimanına gelen uçağın verileri bu kuyruğa atanamaz.Engueue fonksiyonu içerisinde aslında kuyruk yapımız bulunur.Bu fonksiyon öncelik,ucak\_id ve talep\_edilen\_iniş\_saatini dikkate alarak kuyruğa ekler. Eğer iniş talep eden uçağın saati ve bir fazlası(bir fazlası kalkış saatinin diğer güne sarkmaması için)24'ten küçükse değerleri kuruktaki verilerin yerine ayıyoruz.Eğer talep edilen iniş saatinin bir fazlası 24'ten büyük olduğu durumda kalkışı diğer güne sarkıtacağından iptal ediliyor.Bu gibi sarkma 
+durumlarında delete fonksiyonuyla bu verilere sahip uçağı kuyruktan siliyoruz.InisDuzenle fonksiyonu en uzun ve karmaşık fonksiyondur.Çoğu isteri burada karşılayabiliyoruz.Bu fonksiyon içerisinde öncelikle talep edilen iniş saatlerindeki belli sorunları hallederek güncel bir iniş saati belirliyoruz.Şimdi dizi içerisinde iniş saatine sahip bir uçak varken havalimanına yine aynı iniş sattini talep eden başka bir uçak geldiğinde Öncelikle bu iki uçağın öncelik
+sırasına bakılıyor.Öncelik sırası kimdeyse iniş saati bu uçağa veriliyor.Diğer uçak için erteleme işlemi gerçekleşiyor.Bu erteleme de belirli bir gecikmeye sebep oluyor.Bunu da güncel iniş saatinden talep edilen iniş saatini çıkararak buluyoruz.Bu gecikme süresi üçten küçükse ve eşitlikler olmaya devam ediyorsa tekrar ertelenir ama bu süre üçe eşitse ve saat uygunsa iniş izni verilir.Bu fonksiyon içerisinde birçok if ,else if ve else durumlarını kullanarak tüm çakışma durumları gözden geçirildi.Display fonksiyonu içerisinde öncelikle output.txt dosyamızı yazma formatında açıyoruz.Fprintf ile düzenlenen verileri bu dosyaya satır satır yazdırıyoruz.Bu işlem front değeri rear değerine eşit oluncaya kadar devam ediyor.(Yani kuyruktaki tüm elemanları dolaşmış oluyoruz.)
+Yazdırma fonksiyonu bittiğinde output dosyamızı kapatıyoruz.OncelikSiralama fonksiyonu ile kuyruğa aldığımız uçakları sırasıyla teker teker kontrol edip bu uçakları kuyrukta önceliğine kadar sıralıyoruz.Main fonksiyonu içerisinde aslında her zamanki gibi yukarıda tanımlanan fonksiyonları çağırıyoruz.Bundan öncesinde input.txt dosyamızı okuma formatında açarak verilerimizi alıyoruz.Fgets fonksiyonu ile de satır satır okuyoruz.Her yeni satırda tekrar baştan sona 
+karşılaştırma yapılıyor.Outputumuzu da buna göre oluşturduk.Enter karakteri ile ilerleme sağlıyoruz.Her satırda çıktı veriyoruz.}
+
+
+
+
+\section{DENEYSEL SONUÇLAR}
+\paragraph{-Kuyruktaki verilerin satır satır okunup karşılaştırılması.(Figure 1)
+\\-İki uçak için iniş saatleri çakıştığında yapılan erteme.(Figure 2)
+\\-Bir uçak için üç erteleme sonucunda oluşan iniş saati uygun olamadığından diğer havalimanına yönlendirilmesi.(Figure 3)
+\\-Bir uçak için ertelemeler sonucunda oluşan iniş ya da kalkış saatinin diğer güne sarktığı durum.(Figure 4)}
+
+\section{SONUÇ}
+\paragraph{Sonuç olarak bu proje ile bir çok durumu aynı anda kontrol ederek bir kuyruk oluşturmayı,oluşturulan kuyrukta her veri eklenişinde kuyruğu baştan sırayla karşılaştırma yapmayı ve bu karşılaştırmalar sonucunda kuyruktan veri silmeyi öğrendik.Kuyrukta veri silmesini kuruğun başından,sonundan ve ortadan eleman silerek gerçekleştirmeyi öğrendik.Aslında bizden istenilen öncelikli kuyruk yapısının yine bir kuyruk yapısı olduğunu ve normal kuyruktan farkının ise ilk giren verinin ilk çıkması değil de nasıl sıraya girilirse girilsin daha önemli olanın ilk çıkması olduğunu kavradık.Yani bunun için önceliklendirme işlemi tanımlamış olmamız gerekiyor.Biz de elimizdeki kuyruk yapısını önceliğe göre sıralayarak kuruğumuzu öncelikli kuyruğa dönüştürdük.}
+
+
+
+
+\begin{figure}
+   \includegraphics[width=18cm, height=10cm]{SatırSatırOkuma.png}
+  \caption{Kuyruktaki satır satır okumayı gösterir.}
+  \label{fig:my_label}
+\end{figure}
+
+\begin{figure}
+    \includegraphics[width=18cm, height=3cm]{erteleme.png}
+    \caption{İki uçak için iniş saatleri çakıştığında ertelenmeyi gösterir.}
+    \label{fig:my_label}
+\end{figure}
+
+
+\newpage
+\begin{figure}
+    \includegraphics[width=18cm, height=4cm]{BaşkaHavalimanı.png}
+    \caption{Bir uçak için üç erteleme sonucunda uygun saat olmadığından dolayı diğer havalimanına yönlendirilmeyi gösterir.}
+    \label{fig:my_label}
+\end{figure}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=18cm, height=2cm]{DiğerGüneSarkma.png}
+    \caption{Bir uçak için ertelemeler sonucu iniş ya da kalkış saati diğer güne sarktığı için uçuş iptalini gösterir.}
+    \label{fig:my_label}
+\end{figure}
+
+
+
+
+\newpage
+\section{KAYNAKÇA}
+\paragraph{-https://ubenzer.com/2009/01/cde-oncelik-kuyrugu/
+\\-https://cdn-acikogretim.istanbul.edu.tr/auzefcontent/20\_21\_Guz/veri\_yapilari/7/index.html#:~:text=Kuyruk%20veri%20yap%C4%B1s%C4%B1%2C%20eleman%20ekleme,ilk%20hizmetin%20verildi%C4%9Fi%20veri%20yap%C4%B1lar%C4%B1d%C4%B1r.
+\\-https://medium.com/@tolgahan.cepel/do%C4%9Frusal-veri-yap%C4%B1lar%C4%B1-4-kuyruk-queue-dcbd07e8ba77
+\\-https://www.kodaylak.com/2019/08/kuyruk-veri-yapisi.html
+\\-https://www.youtube.com/watch?v=B3NDNr6w41g
+\\-https://www.youtube.com/watch?v=ZsL0P\_UDesw
+}
+
+
+\end{document}

@@ -1,0 +1,703 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+
+#define MAX 50
+
+FILE *fp, *vp;
+struct Ucak
+{
+  int oncelik;
+  int ucak_id;
+  int talep_edilen;
+  int inis_saati;
+  int kalkis_saati;
+  int gecikme_suresi;
+};
+
+struct Ucak u[MAX];
+struct Ucak oncelik[MAX];
+int front = 0, rear = 0;
+int front1 = 0, rear1 = 0;
+int sayac = 0;
+void InisDuzenle ();
+void OncelikSiralama ();
+
+int IsQueueEmpty ()
+{
+  if (front == rear)
+    return 1;
+
+  return -1;
+}
+
+bool IsEmpty(){
+     
+      return rear1==0;
+      
+      
+}
+
+bool IsFull(){
+    
+    return rear1==MAX;
+    
+   
+   
+}
+
+int size(){
+    return rear1;
+}
+
+
+int IsQueueFull ()
+{
+  if (rear == MAX)
+    return 1;
+
+  return -1;
+}
+
+struct Ucak Remove(){
+    
+    return oncelik[--rear1];
+}
+
+void Enqueue (int oncelik, int ucak_id, int talep_edilen)
+{
+
+
+  if (IsQueueFull () == 1)
+    {
+      printf ("Kuyruk dolu..\n");
+    }
+  else
+    {
+
+      if (talep_edilen <= 24 && (talep_edilen + 1) <= 24)
+	{
+	  u[rear].oncelik = oncelik;
+	  u[rear].ucak_id = ucak_id;
+	  u[rear].talep_edilen = talep_edilen;
+	  u[rear].inis_saati = talep_edilen;
+	  u[rear].kalkis_saati = talep_edilen + 1;
+	  u[rear].gecikme_suresi = 0;
+	  rear++;
+	}
+	else{
+	    
+	    if((talep_edilen+1)>24){
+	        printf("oncelik:%d ucak id:%d talep edilen:%d inis saati:%d kalkis saati:%d ucusu ertesi gune kaydigi icin iptal edilmistir.",oncelik,ucak_id,talep_edilen,(talep_edilen),(talep_edilen+1-24));
+	    }
+	    
+	}
+    }
+
+
+
+}
+
+
+void Dequeue ()
+{
+  if (IsQueueEmpty () == 1)
+    {
+      printf ("Kuyruk bos..\n");
+    }
+  else
+    {
+      printf ("%d %d %d %d\n", u[front].oncelik, u[front].ucak_id,
+	      u[front].talep_edilen, u[front].inis_saati);
+      front++;
+    }
+}
+
+int Delete (struct Ucak array[], int size, struct Ucak bul, int konum)
+{
+
+  int i = konum;
+
+  if (i < size)
+    {
+
+
+      for (int j = i; j < size; j++)
+	{
+	  array[j] = array[j + 1];
+	}
+      size = size - 1;
+    }
+
+  return size;
+}
+
+
+void InisDuzenle ()
+{
+    if(rear<24){
+
+  for (int i = rear - 1; i >= front ; i--)
+    {
+      for (int j = front; j < rear ; j++)
+	{
+	  if (u[i].inis_saati == u[j].inis_saati)
+	    {
+	      if (u[j].oncelik > u[i].oncelik)
+		{
+		  if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen == 3)
+		    {
+		      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak uc kez ertelendigi icin inis yapmistir.\n",u[j].oncelik, u[j].ucak_id, u[j].talep_edilen,u[j].inis_saati);
+		      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucak oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d sebebiyle ertelenmistir.\n",u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati, u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati);
+		      u[i].inis_saati += 1;
+		      u[i].kalkis_saati += 1;
+		      u[i].gecikme_suresi = u[i].inis_saati - u[i].talep_edilen;
+		      if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			{    printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d sebebiyle  ertelendi.\n",u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati);
+			  InisDuzenle();
+			}
+		      else
+			{ 
+			    if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			  printf("oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati, u[i].kalkis_saati,u[i].gecikme_suresi);
+			  int a = Delete (u, rear, u[i], i);
+			  rear = a;
+			}
+		    }
+
+		  else if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+		    {
+
+		      u[j].inis_saati += 1;
+		      u[j].kalkis_saati += 1;
+		      u[j].gecikme_suresi = u[j].inis_saati - u[j].talep_edilen;
+		      if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			{     printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d sebebiyle ertelendi.\n",u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati);
+			      InisDuzenle ();
+			}
+		      else
+			{ if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			  printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id, u[j].talep_edilen,u[j].inis_saati, u[j].kalkis_saati,u[j].gecikme_suresi);
+			  int a = Delete (u, rear, u[j], j);
+			  rear = a;
+			}
+		    }
+		  else if (u[i].inis_saati - u[i].talep_edilen == 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+		    {
+		      u[j].inis_saati += 1;
+		      u[j].kalkis_saati += 1;
+		      u[j].gecikme_suresi = u[j].inis_saati - u[j].talep_edilen;
+		      if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			{   printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d sebebiyle ertelendi.\n",u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati);
+			    InisDuzenle ();
+			}
+		      else
+			{ 
+			  if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }    
+			  printf("oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id, u[j].talep_edilen,u[j].inis_saati, u[j].kalkis_saati,u[j].gecikme_suresi);
+			  int a = Delete (u, rear, u[j], j);
+			  rear = a;
+			}
+		    }
+		  else
+		    {
+		      if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			{
+			  printf("oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucak oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle baska havalimanina yonlendirildi.\n",u[j].oncelik, u[j].ucak_id, u[j].talep_edilen,u[j].inis_saati,u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati);
+			  int a = Delete (u, rear, u[j], j);
+			  rear = a;
+			}
+		      else
+			{  
+			  if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }    
+			  printf("oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id, u[j].talep_edilen,u[j].inis_saati, u[j].kalkis_saati,u[j].gecikme_suresi);
+			  int a = Delete (u, rear, u[j], j);
+			  rear = a;
+			}
+
+		    }
+
+		}
+
+	      else if (u[i].oncelik > u[j].oncelik)
+		{
+		  if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+		    {
+		      u[i].inis_saati += 1;
+		      u[i].kalkis_saati += 1;
+		      u[i].gecikme_suresi = u[i].inis_saati - u[i].talep_edilen;
+		      if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			{     printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d sebebiyle ertelendi.\n",u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati);
+			      InisDuzenle ();
+			}
+		      else
+			{ 
+			  if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }    
+			  printf("oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati, u[i].kalkis_saati,u[i].gecikme_suresi);
+			  int a = Delete (u, rear, u[i], i);
+			  rear = a;
+			}
+
+		    }
+		  else if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen == 3)
+		    {
+		      u[i].inis_saati += 1;
+		      u[i].kalkis_saati += 1;
+		      u[i].gecikme_suresi = u[i].inis_saati - u[i].talep_edilen;
+
+		      if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			{    printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati);
+			     InisDuzenle ();
+			}
+		      else
+			{
+              if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			  printf("oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati, u[i].kalkis_saati,u[i].gecikme_suresi);
+			  int a = Delete (u, rear, u[i], i);
+			  rear = a;
+
+
+			}
+
+		    }
+		  else if (u[i].inis_saati - u[i].talep_edilen == 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+		    {
+		      u[j].inis_saati += 1;
+		      u[j].kalkis_saati += 1;
+		      u[j].gecikme_suresi = u[j].inis_saati - u[j].talep_edilen;
+		      if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			{    printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati);
+			    InisDuzenle ();
+			}
+		      else
+			{ if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			  printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id, u[j].talep_edilen,u[j].inis_saati, u[j].kalkis_saati,u[j].gecikme_suresi);
+			  int a = Delete (u, rear, u[j], j);
+			  rear = a;
+			}
+		    }
+		  else
+		    {
+		      if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			{
+			  printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucak oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d  olan ucak sebebiyle Sabiha Gokcen havalimanina yonlendirildi.\n",u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati, u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati);
+			  int a = Delete (u, rear, u[i], i);
+			  rear = a;
+			}
+
+		      else
+			{ 
+			  if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }    
+			  printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id, u[i].talep_edilen,u[i].inis_saati, u[i].kalkis_saati,u[i].gecikme_suresi);
+			  int a = Delete (u, rear, u[i], i);
+			  rear = a;
+			}
+		    }
+
+		}
+
+	      else
+		{
+		  if (u[i].ucak_id > u[j].ucak_id)
+		    {
+		      if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+			{
+			  u[i].inis_saati += 1;
+			  u[i].kalkis_saati += 1;
+			  u[i].gecikme_suresi = u[i].inis_saati - u[i].talep_edilen;
+			  if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			    { printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati);
+			      InisDuzenle ();
+			    }
+
+			  else
+			    {
+			      if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }    
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati,u[i].kalkis_saati, u[i].gecikme_suresi);
+			      int a = Delete (u, rear, u[i], i);
+			      rear = a;
+			    }
+			}
+		      else if (u[i].inis_saati - u[i].talep_edilen == 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+			{
+			  u[j].inis_saati += 1;
+			  u[j].kalkis_saati += 1;
+			  u[j].gecikme_suresi = u[j].inis_saati - u[j].talep_edilen;
+			  if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			    { printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati);
+			      InisDuzenle ();
+			    }
+			  else
+			    { 
+			        if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati,u[j].kalkis_saati, u[j].gecikme_suresi);
+			      int a = Delete (u, rear, u[j], j);
+			      rear = a;
+			    }
+			}
+		      else if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen == 3)
+			{
+			  u[i].inis_saati += 1;
+			  u[i].kalkis_saati += 1;
+			  u[i].gecikme_suresi = u[i].inis_saati - u[i].talep_edilen;
+			  if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			    { printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati);
+			      InisDuzenle ();
+			    }
+			  else
+			    {
+			      if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			        
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati,u[i].kalkis_saati, u[i].gecikme_suresi);
+			      int a = Delete (u, rear, u[i], i);
+			      rear = a;
+			    }
+			}
+		      else
+			{
+			  if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			    {
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak  oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d sebebiyle Sabiha Gokcen havalimanina gonderilmistir. ",u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati,u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati);
+			      int a = Delete (u, rear, u[i], i);
+			      rear = a;
+			    }
+			  else
+			    { if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati,u[i].kalkis_saati, u[i].gecikme_suresi);
+			      int a = Delete (u, rear, u[i], i);
+			      rear = a;
+			    }
+			}
+		    }
+		  else if (u[j].ucak_id > u[i].ucak_id)
+		    {
+		      if (u[j].inis_saati - u[j].talep_edilen < 3 && u[i].inis_saati - u[i].talep_edilen < 3)
+			{
+			  u[j].inis_saati += 1;
+			  u[j].kalkis_saati += 1;
+			  u[j].gecikme_suresi = u[j].inis_saati - u[j].talep_edilen;
+			  if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			    { printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati);
+			      InisDuzenle ();
+			    }
+			  else
+			    {
+			      if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati,u[j].kalkis_saati, u[j].gecikme_suresi);
+			      int a = Delete (u, rear, u[j], j);
+			      rear = a;
+			    }
+			}
+		      else if (u[i].inis_saati - u[i].talep_edilen == 3 && u[j].inis_saati - u[j].talep_edilen < 3)
+			{
+			  u[j].inis_saati += 1;
+			  u[j].kalkis_saati += 1;
+			  u[j].gecikme_suresi = u[j].inis_saati - u[j].talep_edilen;
+			  if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			    { printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati);
+			      InisDuzenle ();
+			    }
+			  else
+			    { if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati,u[j].kalkis_saati, u[j].gecikme_suresi);
+			      int a = Delete (u, rear, u[j], j);
+			      rear = a;
+			    }
+			}
+		      else if (u[i].inis_saati - u[i].talep_edilen < 3 && u[j].inis_saati - u[j].talep_edilen == 3)
+			{
+			  u[i].inis_saati += 1;
+			  u[i].kalkis_saati += 1;
+			  u[i].gecikme_suresi =u[i].inis_saati - u[i].talep_edilen;
+			  if (u[i].inis_saati <= 24 && u[i].kalkis_saati <= 24)
+			    { printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucagin ucusu oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d ucak sebebiyle ertelendi.\n",u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati);
+			      InisDuzenle ();
+			    }
+			  else
+			    {  
+			        if(u[i].inis_saati>24 && u[i].kalkis_saati<=24){
+			              u[i].inis_saati=u[i].inis_saati-24;
+			        }
+			        else if(u[i].inis_saati<=24 && u[i].kalkis_saati>24){
+			            u[i].kalkis_saati=u[i].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }  
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati,u[i].kalkis_saati, u[i].gecikme_suresi);
+			      int a = Delete (u, rear, u[i], i);
+			      rear = a;
+			    }
+			}
+		      else
+			{
+			  if (u[j].inis_saati <= 24 && u[j].kalkis_saati <= 24)
+			    {
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucak  oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d olan ucak sebebiyle Sabiha Gokcen havalimanina yonlendirildi.\n",u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati,u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati);
+			      int a = Delete (u, rear, u[j], j);
+			      rear = a;
+			    }
+			  else
+			    { 
+			        if(u[j].inis_saati>24 && u[j].kalkis_saati<=24){
+			              u[j].inis_saati=u[j].inis_saati-24;
+			        }
+			        else if(u[j].inis_saati<=24 && u[j].kalkis_saati>24){
+			            u[j].kalkis_saati=u[j].kalkis_saati-24;
+			        }
+			        else{
+			            
+			        }
+			      printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucagin inisi veya kalkisi ertesi gune kaydigi icin izin verilememistir.\n",u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati,u[j].kalkis_saati, u[j].gecikme_suresi);
+			      int a = Delete (u, rear, u[j], j);
+			      rear = a;
+			    }
+			}
+		    }
+		  else
+		    {
+
+		    }
+		}
+	    }
+	}
+    }
+    }
+    
+    
+    
+    if(rear==24){
+        
+        for(int i=rear-1;i>=front;i--){
+            
+            for(int j=front;j<rear;j++){
+                
+                if(u[i].inis_saati==u[j].inis_saati){
+                    
+                    
+                    if(u[i].oncelik<u[j].oncelik){
+                        printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucak  oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d acil ucak sebebiyle sabiha gokcen Havalimanina yonlendirildi.\n",u[j].oncelik, u[j].ucak_id,u[j].talep_edilen, u[j].inis_saati,u[j].kalkis_saati, u[j].gecikme_suresi,u[i].oncelik,u[i].ucak_id,u[i].talep_edilen,u[i].inis_saati,u[i].kalkis_saati,u[i].gecikme_suresi);
+                        int a = Delete (u, rear, u[j], j);
+			            rear = a;
+                    }
+                    else{
+                        
+                        printf("\noncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d ucak  oncelik:%d ucak id:%d talep edilen inis saati:%d inis saati:%d kalkis saati:%d gecikme suresi:%d  ucak sebebiyle iptal edilmistir.\n",u[i].oncelik, u[i].ucak_id,u[i].talep_edilen, u[i].inis_saati,u[i].kalkis_saati, u[i].gecikme_suresi,u[j].oncelik,u[j].ucak_id,u[j].talep_edilen,u[j].inis_saati,u[j].kalkis_saati,u[j].gecikme_suresi);
+                        int a = Delete (u, rear, u[i], i);
+			            rear = a;
+                    }
+                }
+                
+                
+            }
+            
+            
+            
+        }
+        
+        
+        
+    }
+
+ 
+
+
+
+
+
+}
+
+
+
+void display ()
+{
+  printf("\nOncelik:\t Ucak id:\t Talep Edilen Inis Saati:\t Inis Saati:\t kalkis_saati:\t Gecikme Suresi: Izin:\n");
+
+  vp = fopen ("Output.txt", "w");
+  fprintf (vp,"Oncelik:\t Ucak id:\t Talep Edilen Inis Saati:\t Inis Saati:\t kalkis_saati:\t Gecikme Suresi: Izin:\n");
+  for (int p = front; p < rear; p++)
+    {
+
+      printf ("%d\t\t %d\t\t %d\t\t\t\t %d\t\t %d\t\t %d\t\t izin verildi.\n",oncelik[p].oncelik, oncelik[p].ucak_id, oncelik[p].talep_edilen,oncelik[p].inis_saati, oncelik[p].kalkis_saati,oncelik[p].gecikme_suresi);
+      fprintf (vp,"%d\t\t\t %d\t\t\t\t\t %d\t\t\t\t\t\t %d\t\t\t\t %d\t\t\t\t %d\t\t\t izin verildi.\n",oncelik[p].oncelik, oncelik[p].ucak_id,oncelik[p].talep_edilen, oncelik[p].inis_saati,oncelik[p].kalkis_saati, oncelik[p].gecikme_suresi);
+    }
+    
+
+  fclose (vp);
+
+
+}
+
+
+
+void OncelikSiralama(){
+    
+    for(int i=front;i<rear-1;i++){
+        
+        for(int j=front;j<rear-i-1;j++){
+            
+            if(u[j].inis_saati>u[j+1].inis_saati){
+                
+                struct Ucak temp=u[j];
+                u[j]=u[j+1];
+                u[j+1]=temp;
+                
+            }
+        }
+    }
+    
+    for(int i=front;i<rear;i++){
+        
+        oncelik[i]=u[i];
+        
+    }
+    
+ 
+}
+
+
+int main ()
+{
+  fp = fopen ("Input.txt", "r");
+  char line[100];
+  int oncelik;
+  int ucak_id;
+  int talep_edilen;
+  int k = 1;
+  
+  
+  fgets (line, 100, fp);
+  while (!feof (fp))
+    {
+      fscanf (fp, "%d %d %d", &oncelik, &ucak_id, &talep_edilen);
+      fflush (stdin);
+      printf ("%d.satir okundu:%d %d %d\n", k++, oncelik, ucak_id,talep_edilen);
+      Enqueue (oncelik, ucak_id, talep_edilen);
+      InisDuzenle ();
+      
+      OncelikSiralama ();
+     
+      display ();
+     
+      printf ("\nDevam etmek icin entera basiniz:\n");
+      getchar();
+
+    }
+
+
+  return 0;
+}
